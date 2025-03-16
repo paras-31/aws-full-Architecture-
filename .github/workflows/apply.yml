@@ -1,0 +1,185 @@
+name: "Terraform Plan/Apply Pipeline"
+
+on:
+  workflow_dispatch:
+    inputs:
+      infra_env:
+        type: choice
+        description: "Select Subscription"
+        options:
+          - "CEQ-DEVOPS-SANDBOX"
+
+permissions: read-all
+env:
+  REGION: us-east-1
+jobs:
+  terraform-plan:
+    name: Terraform Scan & Plan
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} 
+          aws-region: ${{ env.REGION }}
+
+      # - name: Test with Checkov
+      #   id: checkov
+      #   uses: bridgecrewio/checkov-action@master
+      #   with:
+      #     directory: .
+      #     framework: terraform
+      #     download_external_modules: true
+      #     file: ./main.tf
+
+      - name: "Setting Environment"
+        env:
+          INFRA_ENV: ${{ github.event.inputs.infra_env }}
+        run: |
+          if [ "$INFRA_ENV" == "CEQ-DEVOPS-SANDBOX" ]; then
+           echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
+           echo "ENV=sandbox" >> $GITHUB_ENV
+           echo "bucket=aws-wafr-pipeline-tf-state" >> $GITHUB_ENV
+           echo "tfstatefile=aws-vpc/terraform.tfstate" >> $GITHUB_ENV
+           echo "dynamodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
+          elif [ "$INFRA_ENV" == "nonprod" ]; then
+            echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
+            echo "ENV=nonprod" >> $GITHUB_ENV
+            echo "bucket=aws-wafr-pipeline-tf-state" >> $GITHUB_ENV
+            echo "aws-vpc/terraform.tfstate" >> $GITHUB_ENV
+            echo "dyanmodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
+          else
+             echo "environment not supported"
+             exit 1
+          fi
+
+      - name: Setup git global config
+        run: git config --global url."https://oauth2:${{secrets.TURBO_PAT_TOEKN}}@github.com".insteadOf https://github.com
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.8.2
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -reconfigure
+          -backend-config="bucket=$bucket"
+          -backend-config="key=$tfstatefile"
+          #-backend-config="dynamodb_table=$dynamodbtable"
+
+      - name: Terraform Plan
+        env:
+          TF_VAR_rds_username: ${{ secrets.RDS_USERNAME }}
+          TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
+        run: terraform plan -var-file="$ENV/terraform.tfvars" #-out plan.tfplan -input=false
+
+      # - name: Terraform Plan convert JSON Format
+      #   run: terraform show -json plan.tfplan > plan.json
+
+      # - name: Upload plan.json to artifacts
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: plan
+      #     path: ${{ github.workspace }}/plan.json
+
+      # - name: Download plan.json from artifacts
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: plan
+      #     path: ${{ github.workspace }}/downloaded_plan.json
+
+      # - name: Execute Scan Template Script
+      #   run: |
+      #     python ./visionapi.py
+      #   env:
+      #     TOKEN: ${{ secrets.API_TOKEN }}
+
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    needs: ["terraform-plan"]
+
+    environment:
+      name: terraform_apply
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} 
+          aws-region: us-east-1
+
+      - name: "Setting Environment"
+        env:
+          INFRA_ENV: ${{ github.event.inputs.infra_env }}
+        run: |
+          if [ "$INFRA_ENV" == "CEQ-DEVOPS-SANDBOX" ]; then
+           echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
+           echo "ENV=sandbox" >> $GITHUB_ENV
+           echo "bucket=aws-wafr-pipeline-tf-state" >> $GITHUB_ENV
+           echo "tfstatefile=aws-vpc/terraform.tfstate" >> $GITHUB_ENV
+           echo "dynamodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
+          elif [ "$INFRA_ENV" == "nonprod" ]; then
+            echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
+            echo "ENV=nonprod" >> $GITHUB_ENV
+            echo "bucket=aws-wafr-pipeline-tf-state" >> $GITHUB_ENV
+            echo "aws-vpc/terraform.tfstate" >> $GITHUB_ENV
+            echo "dyanmodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
+          else
+             echo "environment not supported"
+             exit 1
+          fi
+
+      - name: Setup git global config
+        run: git config --global url."https://oauth2:${{secrets.TURBO_PAT_TOEKN}}@github.com".insteadOf https://github.com
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.8.2
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -reconfigure
+          -backend-config="bucket=$bucket"
+          -backend-config="key=$tfstatefile"
+          #-backend-config="dynamodb_table=$dynamodbtable"
+
+      - name: Terraform Apply
+        env:
+          TF_VAR_rds_username: ${{ secrets.RDS_USERNAME }}
+          TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
+        run: terraform apply -var-file="$ENV/terraform.tfvars" -auto-approve -input=false
+
+      - name: Upload private key as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-key
+          path: private_key_test

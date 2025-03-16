@@ -1,0 +1,77 @@
+name: "Terraform destroy"
+
+on:
+  workflow_dispatch:
+    inputs:
+      infra_env:
+        type: choice
+        description: "Select Subscription"
+        options:
+          - "CEQ-DEVOPS-SANDBOX"
+
+permissions: read-all
+env:
+  REGION: us-east-1
+
+jobs:
+  terraform-destory:
+    name: TerraformDestroy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+
+      - name: "Setting Environment"
+        env:
+          INFRA_ENV: ${{ github.event.inputs.infra_env }}
+        run: |
+          if [ "$INFRA_ENV" == "CEQ-DEVOPS-SANDBOX" ]; then
+           echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
+           echo "ENV=sandbox" >> $GITHUB_ENV
+           echo "bucket=aws-wafr-pipeline-tf-state" >> $GITHUB_ENV
+           echo "tfstatefile=aws-vpc/terraform.tfstate" >> $GITHUB_ENV
+           echo "dynamodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
+          elif [ "$INFRA_ENV" == "nonprod" ]; then
+            echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
+            echo "ENV=nonprod" >> $GITHUB_ENV
+            echo "bucket=aws-wafr-pipeline-tf-state" >> $GITHUB_ENV
+            echo "aws-vpc/terraform.tfstate" >> $GITHUB_ENV
+            echo "dyanmodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
+          else
+             echo "environment not supported"
+             exit 1
+          fi
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} 
+          aws-region: us-east-1
+
+      - name: Setup git global config
+        run: git config --global url."https://oauth2:${{secrets.TURBO_PAT_TOEKN}}@github.com".insteadOf https://github.com
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.8.2
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -reconfigure
+          -backend-config="bucket=$bucket"
+          -backend-config="key=$tfstatefile"
+          # -backend-config="dynamodb_table=$dynamodbtable"
+
+      - name: Terraform destroy
+        env:
+          TF_VAR_rds_username: ${{ secrets.RDS_USERNAME }}
+          TF_VAR_rds_password: ${{ secrets.RDS_PASSWORD }}
+        id: destroy
+        run: terraform destroy -auto-approve -var-file="$ENV/terraform.tfvars" -input=false  
