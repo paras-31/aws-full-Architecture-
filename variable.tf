@@ -19,6 +19,18 @@ variable "name" {
   
 # }
 
+variable "private_subnet" {
+  type = list(any)
+  description = "list of private subnet cidr"
+}
+
+
+variable "public_subnet" {
+  type = list(any)
+  description = "list of public subnet cidr"
+}
+
+
 variable "endpoints" {
   description = "Configuration for multiple VPC endpoints."
   type = map(object({
@@ -152,9 +164,10 @@ variable "albs" {
   }))
 }
 
-# variable "secret_name" {
-#   type = string
-# }
+variable "secret_name" {
+  type = string
+  default = "secretidpareas"
+}
 
 
 # variable "Ec2" {
@@ -184,7 +197,27 @@ variable "rds_password" {
 }
 
 
+################# waf ###########
 
+variable "rule_group" {
+  type = map(any)
+}
+
+variable "waf_creation" {
+  type = map(any)
+}
+
+variable "regex" {
+  type = map(any)
+}
+
+variable "ip_set" {
+  type = map(any)
+}
+
+# variable "web_acl_association" {
+#   type = map(any)
+# }
 ############# cloudtrail root #############
 
 # variable "name" {

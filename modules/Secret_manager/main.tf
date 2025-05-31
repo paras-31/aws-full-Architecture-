@@ -1,5 +1,5 @@
 resource "aws_secretsmanager_secret" "db_password" {
-  name        = "rds-secret_new1-update"
+  name        = var.secret_name
   description = "Password for the Oracle RDS instance"
 }
 

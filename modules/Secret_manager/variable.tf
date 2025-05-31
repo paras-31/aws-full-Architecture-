@@ -10,6 +10,6 @@ variable "rds_password" {
   sensitive   = true
 }
 
-# variable "secret_name" {
-#   type = string
-# }
+variable "secret_name" {
+  type = string
+}
