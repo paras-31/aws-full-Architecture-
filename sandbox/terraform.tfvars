@@ -217,8 +217,8 @@ multipe_asg = {
     is_public = true
     security_groups = ["web-rules"]
      alb_arn = {
-      alb1 = "testalb1"
-      alb2 = "testalb1"
+      alb1 = "alb1"
+      alb2 = "alb1"
     
     }
     block_device_mappings = [ 
@@ -318,7 +318,7 @@ multipe_asg = {
     security_groups = ["web-rules"]
      alb_arn = {
     
-      alb3 = "testalb2"
+      alb3 = "alb1"
     }
     block_device_mappings = [ 
   {

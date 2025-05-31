@@ -119,7 +119,7 @@ module "alb" {
   source = "./ALB"
 
   for_each = var.albs
-  name                  = each.value.alb_name
+  name                  = each.key
   
   enable_deletion_protection = false
   create_security_group = false
