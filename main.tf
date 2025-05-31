@@ -208,7 +208,7 @@ module "ASG" {
   ] 
 traffic_source_attachments = {
     for k, lb in each.value.alb_arn : "example-${each.key}-${k}" => {
-      traffic_source_identifier = module.alb_arn[lb].target_groups[k].arn
+      traffic_source_identifier = module.alb[lb].target_groups[k].arn
       traffic_source_type       = "elbv2"
     }
   }
