@@ -196,6 +196,25 @@ SecurityGroups_RDS = {
     }
     egress_cidr_blocks = ["0.0.0.0/0"]
   }
+  "web-rules" = {
+    description   = "Database security group"
+    sg_key = {
+      db-rules = {
+        from_port                = 22
+        to_port                  = 22
+        protocol                 = "tcp"
+      }
+    }
+    cidr_key = {  # if you want to pass CIDR ranges then you need to specify the cidr key object like this and if you don't want make it empty like cidr_key = {}
+      db-rules-2 = {
+        from_port                = 80
+        to_port                  = 80
+        protocol                 = "tcp"
+        source_security_group_id = "0.0.0.0/0"
+      }
+    }
+    egress_cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 
@@ -218,7 +237,7 @@ multipe_asg = {
     security_groups              = ["web-rules"]
 
     alb_arn = {
-      alb1 = "alb1"
+      alb1 = "testalb1"
     }
 
     block_device_mappings = [
