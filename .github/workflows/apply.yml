@@ -9,7 +9,9 @@ on:
         options:
           - "CEQ-DEVOPS-SANDBOX"
 
-permissions: read-all
+permissions:
+      id-token: write
+      contents: read
 env:
   REGION: us-east-1
 jobs:
@@ -21,11 +23,6 @@ jobs:
       run:
         shell: bash
 
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
-
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v2
@@ -33,10 +30,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID}}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} 
-          aws-region: ${{ env.REGION }}
+          role-to-assume: arn:aws:iam::609009160573:role/GithubopenIDC
+          role-session-name: "samplerolesession"
+          aws-region: us-east-1
 
       # - name: Test with Checkov
       #   id: checkov
@@ -54,13 +50,13 @@ jobs:
           if [ "$INFRA_ENV" == "CEQ-DEVOPS-SANDBOX" ]; then
            echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
            echo "ENV=sandbox" >> $GITHUB_ENV
-           echo "bucket=aws-wafr-pipeline-tf-state" >> $GITHUB_ENV
+           echo "bucket=aws-wafr-pipeline-tf-state-1" >> $GITHUB_ENV
            echo "tfstatefile=aws-vpc/terraform.tfstate" >> $GITHUB_ENV
            echo "dynamodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
           elif [ "$INFRA_ENV" == "nonprod" ]; then
             echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
             echo "ENV=nonprod" >> $GITHUB_ENV
-            echo "bucket=aws-wafr-pipeline-tf-state" >> $GITHUB_ENV
+            echo "bucket=aws-wafr-pipeline-tf-state-1" >> $GITHUB_ENV
             echo "aws-vpc/terraform.tfstate" >> $GITHUB_ENV
             echo "dyanmodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
           else
@@ -127,12 +123,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} 
+      #     aws-region: us-east-1
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} 
+          role-to-assume: arn:aws:iam::609009160573:role/GithubopenIDC
+          role-session-name: "samplerolesession"
           aws-region: us-east-1
 
       - name: "Setting Environment"
@@ -142,13 +144,13 @@ jobs:
           if [ "$INFRA_ENV" == "CEQ-DEVOPS-SANDBOX" ]; then
            echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
            echo "ENV=sandbox" >> $GITHUB_ENV
-           echo "bucket=aws-wafr-pipeline-tf-state" >> $GITHUB_ENV
+           echo "bucket=aws-wafr-pipeline-tf-state-1" >> $GITHUB_ENV
            echo "tfstatefile=aws-vpc/terraform.tfstate" >> $GITHUB_ENV
            echo "dynamodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
           elif [ "$INFRA_ENV" == "nonprod" ]; then
             echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
             echo "ENV=nonprod" >> $GITHUB_ENV
-            echo "bucket=aws-wafr-pipeline-tf-state" >> $GITHUB_ENV
+            echo "bucket=aws-wafr-pipeline-tf-state-1" >> $GITHUB_ENV
             echo "aws-vpc/terraform.tfstate" >> $GITHUB_ENV
             echo "dyanmodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
           else
