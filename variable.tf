@@ -2074,17 +2074,17 @@ variable "s3_variable" {
 
 variable "create_db_parameter_group" {
   type = bool
-  default = false
+  default = true
 }
 
 variable "create_db_subnet_group" {
   type = bool
-  default = false
+  default = true
 }
 
 variable "create_db_option_group" {
   type = bool
-  default = false
+  default = true
 }
 
 variable "create_db_instance" {

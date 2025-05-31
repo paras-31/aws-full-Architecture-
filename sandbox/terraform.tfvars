@@ -218,7 +218,7 @@ multipe_asg = {
     security_groups = ["web-rules"]
      alb_arn = {
       alb1 = "alb1"
-      alb2 = "alb1"
+      # alb2 = "testalb1"
     
     }
     block_device_mappings = [ 
