@@ -126,43 +126,43 @@ variable "volume_tags" {
   default     = {}
 }
 
-# variable "albs" {
-#   description = "A mapping of tags to assign to the devices created by the instance at launch time"
-#   type        = map(any)
-#   default     = {}
-# }
 variable "albs" {
-  type = map(object({
-    listeners = map(object({
-      port            = number
-      certificate_arn = optional(string)
-      protocol        = string
-      target_group_key = string
-      order           = number
-      rules = map(object({
-        priority = number
-        conditions = list(object({
-          http_header = object({
-            http_header_name = string
-            values           = list(string)
-          })
-        }))
-        actions = list(object({
-          type             = string
-          order            = number
-          target_group_key = string
-        }))
-      }))
-    }))
-    target_groups = map(object({
-      name              = string
-      port              = number
-      protocol          = string
-      target_type       = string
-      create_attachment = bool
-    }))
-  }))
+  description = "A mapping of tags to assign to the devices created by the instance at launch time"
+  type        = map(any)
+  default     = {}
 }
+# variable "albs" {
+#   type = map(object({
+#     listeners = map(object({
+#       port            = number
+#       certificate_arn = optional(string)
+#       protocol        = string
+#       target_group_key = string
+#       order           = number
+#       rules = map(object({
+#         priority = number
+#         conditions = list(object({
+#           http_header = object({
+#             http_header_name = string
+#             values           = list(string)
+#           })
+#         }))
+#         actions = list(object({
+#           type             = string
+#           order            = number
+#           target_group_key = string
+#         }))
+#       }))
+#     }))
+#     target_groups = map(object({
+#       name              = string
+#       port              = number
+#       protocol          = string
+#       target_type       = string
+#       create_attachment = bool
+#     }))
+#   }))
+# }
 
 variable "secret_name" {
   type = string
