@@ -1,5 +1,9 @@
 name: "Terraform Plan/Apply Pipeline"
 
+permissions:
+    id-token: write
+    contents: read
+
 on:
   workflow_dispatch:
     inputs:
@@ -9,9 +13,6 @@ on:
         options:
           - "CEQ-DEVOPS-SANDBOX"
 
-permissions:
-      id-token: write
-      contents: read
 env:
   REGION: us-east-1
 jobs:
