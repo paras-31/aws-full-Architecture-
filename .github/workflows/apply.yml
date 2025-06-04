@@ -117,8 +117,9 @@ jobs:
       id-token: write
       contents: read
 
-    environment:
-      name: terraform_apply
+
+    # environment:
+    #   name: terraform_apply
 
     defaults:
       run:
@@ -127,6 +128,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Dump GitHub OIDC Token (debug)
+        run: |
+          echo "GITHUB_TOKEN: $ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+          echo "OIDC URL: $ACTIONS_ID_TOKEN_REQUEST_URL"
 
       # - name: Configure AWS Credentials
       #   uses: aws-actions/configure-aws-credentials@v1
@@ -139,7 +144,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::609009160573:role/GithubopenIDC
-          role-session-name: "samplerolesession"
+          role-session-name: "samplerolesession-2"
           aws-region: us-east-1
 
       - name: "Setting Environment"
