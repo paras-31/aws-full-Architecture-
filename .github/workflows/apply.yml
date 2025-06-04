@@ -113,6 +113,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: ["terraform-plan"]
 
+    permissions:
+      id-token: write
+      contents: read
+
     environment:
       name: terraform_apply
 
