@@ -530,7 +530,7 @@ module "lambda_function" {
 module "db_subnet_group" {
   source = "./modules/db_subnet_group"
   for_each = var.create_db_subnet_group ? var.db_subnet_group : {}
-  name            = each.value.subnet_name
+  name            = each.key
   description     = each.value.db_subnet_group_description
   subnet_ids      = module.awsvpc.private_subnets
   tags = var.tags
@@ -541,7 +541,7 @@ module "db_parameter_group" {
 
   for_each = var.create_db_parameter_group ? var.db_parameter_group : {}
 
-  name            = each.value.db_name
+  name            = each.key
   description     = each.value.parameter_group_description
   family          = each.value.family
 
@@ -554,7 +554,7 @@ module "db_option_group" {
 
   for_each = var.create_db_option_group ? var.db_option_group : {}
 
-  name                     = each.value.option_name
+  name                     = each.key
   option_group_description = each.value.option_group_description
   engine_name              = each.value.engine
   major_engine_version     = each.value.major_engine_version

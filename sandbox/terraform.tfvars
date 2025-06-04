@@ -291,75 +291,75 @@ multipe_asg = {
     }
   }
 
-  "asg-2" = {
-    name                         = "prod-web-server-turbo-asg"
-    max                          = 2
-    min                          = 1
-    desired_capacity             = 1
-    wait_for_capacity_timeout    = 0
-    default_instance_warmup      = 300
-    health_check_type            = "EC2"
-    launch_template_name         = "prod-asg"
-    image_id                     = "ami-0c614dee691cbbf37"
-    launch_template_description  = "prod-asg-launch-template"
-    instance_type                = "t3.micro"
-    is_public                    = true
-    security_groups              = ["web-rules"]
+  # "asg-2" = {
+  #   name                         = "prod-web-server-turbo-asg"
+  #   max                          = 2
+  #   min                          = 1
+  #   desired_capacity             = 1
+  #   wait_for_capacity_timeout    = 0
+  #   default_instance_warmup      = 300
+  #   health_check_type            = "EC2"
+  #   launch_template_name         = "prod-asg"
+  #   image_id                     = "ami-0c614dee691cbbf37"
+  #   launch_template_description  = "prod-asg-launch-template"
+  #   instance_type                = "t3.micro"
+  #   is_public                    = true
+  #   security_groups              = ["web-rules"]
 
-    alb_arn = {
-      alb3 = "alb1"
-    }
+  #   alb_arn = {
+  #     alb3 = "alb1"
+  #   }
 
-    block_device_mappings = [
-      {
-        device_name = "/dev/xvda"
-        no_device   = 0
-        ebs = {
-          delete_on_termination = true
-          encrypted             = true
-          volume_size           = 20
-          volume_type           = "gp2"
-        }
-      },
-      {
-        device_name = "/dev/xvdf"
-        no_device   = 0
-        ebs = {
-          delete_on_termination = true
-          encrypted             = true
-          volume_size           = 50
-          volume_type           = "gp3"
-        }
-      }
-    ]
+  #   block_device_mappings = [
+  #     {
+  #       device_name = "/dev/xvda"
+  #       no_device   = 0
+  #       ebs = {
+  #         delete_on_termination = true
+  #         encrypted             = true
+  #         volume_size           = 20
+  #         volume_type           = "gp2"
+  #       }
+  #     },
+  #     {
+  #       device_name = "/dev/xvdf"
+  #       no_device   = 0
+  #       ebs = {
+  #         delete_on_termination = true
+  #         encrypted             = true
+  #         volume_size           = 50
+  #         volume_type           = "gp3"
+  #       }
+  #     }
+  #   ]
 
-    network_interfaces = [
-      {
-        delete_on_termination = true
-        description           = "eth0"
-        device_index          = 0
-        associate_public_ip_address = true
-        connection_tracking_specification = {
-          tcp_established_timeout = 60
-          udp_stream_timeout      = 60
-          udp_timeout             = 60
-        }
-      }
-    ]
+  #   network_interfaces = [
+  #     {
+  #       delete_on_termination = true
+  #       description           = "eth0"
+  #       device_index          = 0
+  #       associate_public_ip_address = true
+  #       connection_tracking_specification = {
+  #         tcp_established_timeout = 60
+  #         udp_stream_timeout      = 60
+  #         udp_timeout             = 60
+  #       }
+  #     }
+  #   ]
 
-    scaling_policies = {
-      "avg-cpu-policy-greater-than-50" = {
-        policy_type                = "TargetTrackingScaling"
-        estimated_instance_warmup = 300
-        target_tracking_configuration = {
-          predefined_metric_specification = {
-            predefined_metric_type = "ASGAverageCPUUtilization"
-          }
-          target_value = 50.0
-        }
-      }
-    }
-  }
+  #   scaling_policies = {
+  #     "avg-cpu-policy-greater-than-50" = {
+  #       policy_type                = "TargetTrackingScaling"
+  #       estimated_instance_warmup = 300
+  #       target_tracking_configuration = {
+  #         predefined_metric_specification = {
+  #           predefined_metric_type = "ASGAverageCPUUtilization"
+  #         }
+  #         target_value = 50.0
+  #       }
+  #     }
+  #   }
+  # }
 }
 
 #-------------S3 Inputs----------------#
