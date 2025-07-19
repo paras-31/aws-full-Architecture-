@@ -206,7 +206,15 @@ SecurityGroups_RDS = {
       }
     }
     cidr_key = {  # if you want to pass CIDR ranges then you need to specify the cidr key object like this and if you don't want make it empty like cidr_key = {}
-      db-rules-2 = {
+      HTTP-rules-2 = {
+        from_port                = 80
+        to_port                  = 80
+        protocol                 = "tcp"
+        source_security_group_id = "0.0.0.0/0"
+      }
+    }
+    cidr_key = {  # if you want to pass CIDR ranges then you need to specify the cidr key object like this and if you don't want make it empty like cidr_key = {}
+      ssh-rule = {
         from_port                = 80
         to_port                  = 80
         protocol                 = "tcp"
@@ -230,7 +238,7 @@ multipe_asg = {
     default_instance_warmup      = 300
     health_check_type            = "EC2"
     launch_template_name         = "dev-asg"
-    image_id                     = "ami-0953476d60561c955"
+    image_id                     = "ami-0f535a71b34f2d44a"
     launch_template_description  = "web-asg-launch-template"
     instance_type                = "t3.micro"
     is_public                    = true

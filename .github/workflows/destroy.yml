@@ -33,13 +33,13 @@ jobs:
           if [ "$INFRA_ENV" == "CEQ-DEVOPS-SANDBOX" ]; then
            echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
            echo "ENV=sandbox" >> $GITHUB_ENV
-           echo "bucket=aws-wafr-pipeline-tf-state-1" >> $GITHUB_ENV
+           echo "bucket=aws-wafr-pipeline-tf-state-paras" >> $GITHUB_ENV
            echo "tfstatefile=aws-vpc/terraform.tfstate" >> $GITHUB_ENV
            echo "dynamodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
           elif [ "$INFRA_ENV" == "nonprod" ]; then
             echo "project_id=ceq-devops-sandbox" >> $GITHUB_ENV
             echo "ENV=nonprod" >> $GITHUB_ENV
-            echo "bucket=aws-wafr-pipeline-tf-state-1" >> $GITHUB_ENV
+            echo "bucket=aws-wafr-pipeline-tf-state-paras" >> $GITHUB_ENV
             echo "aws-vpc/terraform.tfstate" >> $GITHUB_ENV
             echo "dyanmodbtable=AWS_pricing_module_table" >> $GITHUB_ENV
           else
@@ -57,7 +57,7 @@ jobs:
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::609009160573:role/GithubopenIDC
+          role-to-assume: arn:aws:iam::783764585732:role/connectionwithgithubforpipeline
           role-session-name: "samplerolesession"
           aws-region: us-east-1
 
