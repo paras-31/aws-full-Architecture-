@@ -364,54 +364,54 @@ traffic_source_attachments = {
 # }
 
 # #---------------------------- KMS-----------------------------#
-# module "kms" {
-#   source                  = "./ceq_tf_template_aws_kms"
-#   create                  = var.create
-#   deletion_window_in_days = var.deletion_window_in_days
-#   description             = var.description
-#   enable_key_rotation     = var.enable_key_rotation
-#   aliases                 = var.aliases
-#   tags                    = var.tags
-# }
+module "kms" {
+  source                  = "./ceq_tf_template_aws_kms"
+  create                  = var.create
+  deletion_window_in_days = var.deletion_window_in_days
+  description             = var.description
+  enable_key_rotation     = var.enable_key_rotation
+  aliases                 = var.aliases
+  tags                    = var.tags
+}
 
 ######## Data block for s3 cloudtrailalerts #########
 
-# data "aws_iam_policy_document" "cloudtrail_policy" {
-#   for_each = { for k, v in var.s3_variable : k => v if k == "CSB1" }
-#   statement {
-#     sid = "Allow PutObject"
-#     actions = [
-#       "s3:PutObject"
-#     ]
+data "aws_iam_policy_document" "cloudtrail_policy" {
+  for_each = { for k, v in var.s3_variable : k => v if k == "CSB1" }
+  statement {
+    sid = "Allow PutObject"
+    actions = [
+      "s3:PutObject"
+    ]
 
-#     resources = ["arn:aws:s3:::${each.value.bucket_name}/*"]
+    resources = ["arn:aws:s3:::${each.value.bucket_name}/*"]
 
-#     principals {
-#       type        = "Service"
-#       identifiers = ["cloudtrail.amazonaws.com"]
-#     }
-#     condition {
-#       test     = "StringLike"
-#       variable = "s3:x-amz-acl"
-#       values   = ["bucket-owner-full-control"]
-#     }
-#     }
-#   statement {
-#     sid = "Allow GetBucketLocation"
-#     actions = [
-#       "s3:GetBucketLocation",
-#       "s3:GetBucketAcl",
-#       "s3:ListBucket"
-#     ]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+    }
+  statement {
+    sid = "Allow GetBucketLocation"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:GetBucketAcl",
+      "s3:ListBucket"
+    ]
 
-#     resources = ["arn:aws:s3:::${each.value.bucket_name}"]
+    resources = ["arn:aws:s3:::${each.value.bucket_name}"]
 
-#     principals {
-#       type        = "Service"
-#       identifiers = ["cloudtrail.amazonaws.com"]
-#     }
-#   }
-# }
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+  }
+}
 # # #--------------------------------------------S3------------------------------------#
 module "s3_bucket" {
   source = "./ceq_tf_template_aws_s3"
@@ -434,7 +434,7 @@ module "s3_bucket" {
   policy        = each.key == "CSB1" ? data.aws_iam_policy_document.cloudtrail_policy["CSB1"].json :""
 }
 
-# # ####### SNS #########
+############ SNS #########
 
 # module "sns" {
 #   source            = "./ceq_tf_template_aws_sns"
@@ -444,11 +444,7 @@ module "s3_bucket" {
 #   kms_master_key_id = module.kms.key_id
 #   subscriptions     = each.value.subscriptions
 #   tags              = var.tags
-  
-
 # }
-
-
 
 
 # data "archive_file" "lambda" {
@@ -458,8 +454,6 @@ module "s3_bucket" {
 #   source_file = "${each.value.file}"
 #   output_path = "${path.module}/${each.key}.zip"
 # }
-
-
 
 # module "lambda_function" {
 #   depends_on = [ module.s3_bucket ]
