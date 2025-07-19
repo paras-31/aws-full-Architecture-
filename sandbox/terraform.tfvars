@@ -59,33 +59,33 @@ albs = {
     alb_name = "alb1"
     sg_name = "alb-rules"
     listeners = {
-      alb1 = {
-        port     = 443
-        # certificate_arn = "arn:aws:acm:us-east-1:533267235239:certificate/d3bfa7e3-c4cd-4c7f-ac2f-0b9501e9b29e"  #if you will change your port to 443 and you need to pass certificate arn then uncomment this attribute and paste your arn here
-        protocol = "HTTPS"
-        target_group_key = "alb1"
-        order    = 1
-        rules = {
-          rule1 = {
-            priority = 100
-            conditions = [
-              {
-                http_header = {
-                  http_header_name = "X-Custom-Header"
-                  values           = ["CustomValue"]
-                }
-              }
-            ]
-            actions = [
-              {
-                type             = "forward"
-                order            = 1
-                target_group_key = "alb1"
-              }
-            ]
-          }
-        }
-      },
+      # alb1 = {
+      #   port     = 80
+      #   # certificate_arn = "arn:aws:acm:us-east-1:533267235239:certificate/d3bfa7e3-c4cd-4c7f-ac2f-0b9501e9b29e"  #if you will change your port to 443 and you need to pass certificate arn then uncomment this attribute and paste your arn here
+      #   protocol = "HTTP"
+      #   target_group_key = "alb1"
+      #   order    = 1
+      #   rules = {
+      #     rule1 = {
+      #       priority = 100
+      #       conditions = [
+      #         {
+      #           http_header = {
+      #             http_header_name = "X-Custom-Header"
+      #             values           = ["CustomValue"]
+      #           }
+      #         }
+      #       ]
+      #       actions = [
+      #         {
+      #           type             = "forward"
+      #           order            = 1
+      #           target_group_key = "alb1"
+      #         }
+      #       ]
+      #     }
+      #   }
+      # },
       alb2 = {
         port     = 80
         # certificate_arn = "arn:aws:acm:us-east-1:533267235239:certificate/d3bfa7e3-c4cd-4c7f-ac2f-0b9501e9b29e"  #if you will change your port to 443 and you need to pass certificate arn then uncomment this attribute and paste your arn here
@@ -115,13 +115,13 @@ albs = {
       }
     }
     target_groups = {
-      alb1 = {
-        name              = "target1"
-        port              = 443
-        protocol          = "HTTPS"
-        target_type       = "instance"
-        create_attachment = false
-      },
+      # alb1 = {
+      #   name              = "target1"
+      #   port              = 443
+      #   protocol          = "HTTPS"
+      #   target_type       = "instance"
+      #   create_attachment = false
+      # },
       alb2 = {
         name              = "target2"
         port              = 80
